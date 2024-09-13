@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/inventory_screen.dart';
 import 'screens/income_expense_screen.dart';
+import 'screens/BusinessAnalyticsScreen.dart';
 
 void main() {
   runApp(MSMManagementApp());
@@ -48,10 +49,10 @@ class HomeScreen extends StatelessWidget {
               // Business Analytics Section (Placeholder for Future Feature)
               ElevatedButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Business Analytics Coming Soon!'),
-                    ),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => BusinessAnalyticsScreen()),
                   );
                 },
                 child: Text('Business Analytics'),
