@@ -6,7 +6,7 @@ class InventoryScreen extends StatefulWidget {
 }
 
 class _InventoryScreenState extends State<InventoryScreen> {
-  final List<String> _products = [];
+  final List<Map<String, dynamic>> _products = [];
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
               itemCount: _products.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(_products[index]),
+                  title: Text(_products[index]['name']),
+                  subtitle: Text('Price: KES ${_products[index]['price']}'),
                   trailing: IconButton(
                     icon: Icon(Icons.delete),
                     onPressed: () {
@@ -30,6 +31,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       });
                     },
                   ),
+                  onTap: () {
+                    _editProduct(context, index); // Function to edit product
+                  },
                 );
               },
             ),
@@ -37,19 +41,101 @@ class _InventoryScreenState extends State<InventoryScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-              onSubmitted: (value) {
-                setState(() {
-                  _products.add(value);
-                });
-              },
               decoration: InputDecoration(
-                labelText: 'Add Product',
+                labelText: 'Product Name',
                 border: OutlineInputBorder(),
               ),
+              onSubmitted: (value) {
+                _addProduct(context, value); // Add product function
+              },
             ),
           ),
         ],
       ),
+    );
+  }
+
+  void _addProduct(BuildContext context, String productName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String price = '';
+        return AlertDialog(
+          title: Text('Add Product'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Enter the price for $productName'),
+              TextField(
+                onChanged: (value) {
+                  price = value;
+                },
+                decoration: InputDecoration(
+                  labelText: 'Price',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (price.isNotEmpty) {
+                  setState(() {
+                    _products.add({"name": productName, "price": price});
+                  });
+                }
+                Navigator.of(context).pop();
+              },
+              child: Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _editProduct(BuildContext context, int index) {
+    String updatedPrice = _products[index]['price'];
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Edit Product: ${_products[index]['name']}'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Update price:'),
+              TextField(
+                onChanged: (value) {
+                  updatedPrice = value;
+                },
+                controller:
+                    TextEditingController(text: _products[index]['price']),
+                decoration: InputDecoration(
+                  labelText: 'Price',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (updatedPrice.isNotEmpty) {
+                  setState(() {
+                    _products[index]['price'] = updatedPrice;
+                  });
+                }
+                Navigator.of(context).pop();
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
