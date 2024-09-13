@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Ensure intl package is added to pubspec.yaml
+import 'package:intl/intl.dart';
+import 'package:fl_chart/fl_chart.dart'; // Import the fl_chart package
 
 class BusinessAnalyticsScreen extends StatefulWidget {
   @override
@@ -67,23 +68,69 @@ class _BusinessAnalyticsScreenState extends State<BusinessAnalyticsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Analytics Overview',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(
+              'Analytics Overview',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 16),
-            Text('Total Income: KES $totalIncome',
-                style: TextStyle(fontSize: 18, color: Colors.green)),
+            Text(
+              'Total Income: KES $totalIncome',
+              style: TextStyle(fontSize: 18, color: Colors.green),
+            ),
             SizedBox(height: 8),
-            Text('Total Expenses: KES $totalExpense',
-                style: TextStyle(fontSize: 18, color: Colors.red)),
+            Text(
+              'Total Expenses: KES $totalExpense',
+              style: TextStyle(fontSize: 18, color: Colors.red),
+            ),
             SizedBox(height: 8),
-            Text('Net Profit: KES $netProfit',
-                style: TextStyle(
-                    fontSize: 18,
-                    color: netProfit >= 0 ? Colors.green : Colors.red)),
-            Divider(),
+            Text(
+              'Net Profit: KES $netProfit',
+              style: TextStyle(
+                fontSize: 18,
+                color: netProfit >= 0 ? Colors.green : Colors.red,
+              ),
+            ),
             SizedBox(height: 16),
-            Text('Transaction Breakdown',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(
+              'Transaction Breakdown',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+            // Chart for visual representation
+            SizedBox(
+              height: 300,
+              child: LineChart(
+                LineChartData(
+                  gridData: FlGridData(show: false),
+                  titlesData: FlTitlesData(show: false),
+                  borderData: FlBorderData(
+                    show: true,
+                    border: Border.all(
+                      color: const Color(0xff37434d),
+                      width: 1,
+                    ),
+                  ),
+                  minX: 0,
+                  maxX: 6,
+                  minY: 0,
+                  maxY: 5000,
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: _transactions.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        var transaction = entry.value;
+                        return FlSpot(index.toDouble(), transaction['amount']);
+                      }).toList(),
+                      isCurved: true,
+                      colors: [Colors.blue],
+                      dotData: FlDotData(show: false),
+                      belowBarData: BarAreaData(show: false),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
                 itemCount: _transactions.length,
@@ -91,11 +138,13 @@ class _BusinessAnalyticsScreenState extends State<BusinessAnalyticsScreen> {
                   var transaction = _transactions[index];
                   return ListTile(
                     title: Text(
-                        '${transaction["type"]}: KES ${transaction["amount"]}',
-                        style: TextStyle(
-                            color: transaction['type'] == "Income"
-                                ? Colors.green
-                                : Colors.red)),
+                      '${transaction["type"]}: KES ${transaction["amount"]}',
+                      style: TextStyle(
+                        color: transaction['type'] == "Income"
+                            ? Colors.green
+                            : Colors.red,
+                      ),
+                    ),
                     subtitle: Text(_formatDate(transaction['date'])),
                   );
                 },
